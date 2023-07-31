@@ -2,13 +2,22 @@
 
 ## Learning Goals
 
-- Use the Flask Shell to execute commands to insert, query, update, and delete
-  rows in a database table.
+- Use an external library Flask-SQLAlchemy to simplify tasks from earlier ORM
+  lessons.
+- Manage database tables and schemas without writing SQL.
+- Use the Flask Shell with Flask-SQLAlchemy to create, read, update and delete
+  records in a SQL database.
 
 ---
 
 ## Key Vocab
 
+- **Schema:** The blueprint of a database. Describes how data relates to other
+  data in tables, columns, and relationships between them.
+- **SQLAlchemy:** An open-source SQL library and object-relational mapper (ORM)
+  for the Python programming language.
+- **Flask-SQLAlchemy:** A Flask extension that makes it easier to use
+  SQLAlchemy.
 - **Flask Shell**: A Python interactive shell to run commands in the context of
   a Flask application.
 - **Database Session**: An object that manages persistence operations for
@@ -21,9 +30,9 @@
 
 ## Introduction
 
-Now that we've created a database with a `pets` table that is linked to a Flask
-application, we'll step through the `Flask-SQLAlchemy` functions to insert,
-update, delete, and query rows in the table.
+We've see how to create a database that is linked to our Flask application. In
+this lesson, we'll use `Flask-SQLAlchemy` functions to insert, update, delete,
+and query rows in a table, all without writing any SQL!
 
 ## Setup
 
@@ -77,7 +86,8 @@ $ flask db migrate -m "Initial migration."
 $ flask db upgrade head
 ```
 
-Open the database file `app.db` and confirm the `pets` table:
+Use a VS Code extension such as SQLite Viewer to open the database file `app.db`
+and confirm the empty `pets` table:
 
 ![new pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/pet_table.png)
 
@@ -89,14 +99,15 @@ migrate, upgrade) to recreate the initial version of the database.
 
 ## The Flask Shell - Insert
 
-Let's see how to insert rows into the `pets` table.
+Let's see how to persist data about a pet. Recall from the previous lessons
+about ORM that we don't actually save a Python object to the database. Instead,
+we save the object's attributes as a new row in a table.
 
 We can interact with our code in the Python shell or an `ipdb` session, but
 working with a web framework presents a bit of a conundrum: the application
-isn't running! Flask comes equipped with an interactive shell that runs a
-development version of an application. Inside this shell, we can interact with
-models, views, contexts, and the database as if the application were really
-running online.
+isn't running! Thankfully, Flask comes equipped with an interactive shell that
+runs a development version of an application. Inside this shell, we can interact
+with models, views, contexts, and the database.
 
 If you're not there already, navigate to the `server` directory, then enter the
 command `flask shell`:
@@ -115,20 +126,20 @@ First, let's import the necessary `db` database object and the `Pet` model:
 ```
 
 Let's add a row to the `pets` table for a dog named "Fido". The steps to add a
-table row are:
+row are as follows:
 
 1. Create a new instance of the model class `Pet`.
 2. Add the `Pet` instance to the current database session.
 3. Commit the transaction and apply the changes to the database.
 
 The first step is creating the `Pet` instance. Type the following Python
-assignment statement:
+assignment statement in the Flask shell:
 
 ```console
 >>> pet1 = Pet(name = "Fido", species = "Dog")
 ```
 
-An instance of `Pet` was created, however, the object has not been persisted to
+An instance of `Pet` is created, however, the object has not been persisted to
 the database.
 
 Let's confirm the `name` and `species` attributes have been assigned values, but
@@ -151,14 +162,16 @@ function shows the id as `None`, confirming no value has been assigned:
 <Pet None, Fido, Dog>
 ```
 
-The `id` won't be assigned until the pet has been added to the database.
+NOTE: The `id` won't be assigned until the `Pet` instance has been added to the
+database.
 
-This requires a database session, which is an object that manages database
-transactions. A transaction is a sequence of SQL statements that are processed
-as an atomic unit. This means that either all SQL statements in the transaction
-are either applied ( committed) or they are all undone (rolled back) together.
+Persisting an object to the database requires a database session, which is an
+object that manages database transactions. A transaction is a sequence of SQL
+statements that are processed as an atomic unit. This means that either all SQL
+statements in the transaction are either applied (committed) or they are all
+undone (rolled back) together.
 
-This is especially important if statements that occur in a sequence on depend on
+This is especially important if statements that occur in a sequence depend on
 previous statements executing properly. The workflow for a transaction is
 illustrated in the image below:
 
@@ -172,19 +185,20 @@ transaction and the process will end, returning an error message. A committed
 transaction ensures all statements were executed in sequence and to completion.
 
 Flask-SQLAlchemy provides the `db.session` object through which we can manage
-database changes.
+changes to the database such as table row insertions, updates, and deletions.
 
 Let's add the pet object to the database session using the `db.session.add()`
-method:
+method. Type the following in the Flask shell:
 
 ```console
 >>> db.session.add(pet1)
 ```
 
-This method call will issue an SQL INSERT statement, but the pet's `id`
-attribute is still undefined because we have not yet committed the current
-transaction. Use the `db.session.commit()` method to commit the transaction and
-insert the new row in the database table.
+This method call will issue an SQL INSERT statement, but the `id` attribute of
+the `Pet` instance in the Python application is still undefined because we have
+not yet committed the current transaction. We need to call the
+`db.session.commit()` method to commit the transaction and ensure the new row
+was inserted in the database table.
 
 ```console
 >>> db.session.commit()
@@ -195,8 +209,9 @@ Viewer, you may need to press the refresh button to see the new row:
 
 ![first row inserted in pet](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/insert_dog1.png)
 
-When the transaction is committed and the row is inserted, the `id` of the local
-`Pet` instance is assigned the primary key value :
+When the transaction is committed and the row is inserted in the `pets` table,
+the `id` of the local `Pet` instance is assigned the primary key value from the
+new row:
 
 ```console
 >>> pet1.id
@@ -213,11 +228,13 @@ at the Flask shell prompt:
 >>> db.session.commit()
 ```
 
-Confirm a new row was inserted in the `pets` table for the cat named "Whiskers":
+Refresh the view in the SQLite Viewer to confirm a new row was inserted in the
+`pets` table for the cat named "Whiskers":
 
 ![second row inserted in pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/insert_cat.png)
 
-Confirm the `id` attribute is assigned for the newly persisted object:
+In the Flask shell, we can confirm the `id` attribute is assigned for the newly
+persisted object:
 
 ```console
 >>> pet2.name
@@ -240,7 +257,7 @@ We can query all the rows in the table associated with the `Pet` model as shown:
 ```
 
 How did the `Pet` class get a `query` attribute? `Pet` inherits it from
-`db.Model`!
+`db.Model`! The `all()` function says to return every row from the query result.
 
 If we just want just the first row returned from a query, use the `first()`
 function:
@@ -258,15 +275,15 @@ cats:
 [<Pet 2, Whiskers, Cat>]
 ```
 
-We can filter by the primary key `id`:
+We can filter by the primary key `id` to get a specific row:
 
 ```console
 >>> Pet.query.filter_by(id=1).first()
 <Pet 1, Fido, Dog>
 ```
 
-We can also use the shorter `get()` method to get the row for the given primary
-key value:
+We can also use the shorter `get()` method to get the row for a given `id`
+primary key value:
 
 ```console
 >>> Pet.query.get(1)
@@ -276,14 +293,15 @@ key value:
 
 ## The Flask Shell - Update
 
-If we assign a new attribute value to a Python object that has been persisted to
-the database, the associated table row **does not** automatically get updated.
+When we assign a new attribute value to a Python object that has been persisted
+to the database, the associated table row **does not** automatically get
+updated.
 
 We need to perform the following steps to update a row in the `pets` table:
 
-1. Update the attribute value of a `Pet` instance.
+1. Update one or more attribute values of a `Pet` instance.
 2. Add the `Pet` instance to the current database session.
-3. Commit the transaction and apply the changes to the database.
+3. Commit the transaction to apply the changes to the database.
 
 ```console
 >>> pet1
@@ -294,6 +312,8 @@ We need to perform the following steps to update a row in the `pets` table:
 >>> db.session.add(pet1)            # issue an SQL UPDATE statement
 >>> db.session.commit()             # commit the UPDATE statement
 ```
+
+We can see the table row is updated once the transaction is committed:
 
 ![update row in pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/update_pet.png)
 
@@ -320,7 +340,7 @@ We can also check the table using the SQLite Viewer:
 
 If you want to delete all table rows, call the function `Pet.query.delete()`.
 The function returns the number of rows deleted. Make sure you commit the
-transaction.
+transaction to persist the deleted row.
 
 ```console
 >>> Pet.query.delete()
@@ -328,12 +348,14 @@ transaction.
 >>> db.session.commit()
 ```
 
-Confirm there are no pets in the table:
+We can use the Flask shell to confirm there are no pets in the table:
 
 ```console
 >>> Pet.query.all()
 []
 ```
+
+The SQLite Viewer also shows the empty table:
 
 ![new pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/pet_table.png)
 
