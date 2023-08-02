@@ -247,7 +247,7 @@ persisted object:
 <Pet 2, Whiskers, Cat>
 ```
 
-## The Flask Shell - Query
+## Query
 
 We can query all the rows in the table associated with the `Pet` model as shown:
 
@@ -267,8 +267,31 @@ function:
 <Pet 1, Fido, Dog>
 ```
 
-We can filter the rows using the `filter_by` function. For example, to get all
-cats:
+## Filter
+
+We can filter rows using the `filter` function. The function takes a boolean
+expression as an argument that is evaluated against each model instance returned
+from the query. For example, if we want to filter each pet by species:
+
+```console
+>>> Pet.query.filter(Pet.species == 'Cat').all()
+[<Pet 2, Whiskers, Cat>]
+```
+
+If we want pets whose name starts with the letter 'F':
+
+```console
+>>> Pet.query.filter(Pet.name.startswith('F')).all()
+[<Pet 1, Fido, Dog>]
+```
+
+## Filter_by
+
+The `filter` function is powerful in that you can pass any boolean expression to
+test on a model instance. However, we often want to just look for rows having a
+particular value in a column. The `filter_by` function is useful for that. The
+criteria passed as a function argument takes a single equal sign. For example,
+to get all cats:
 
 ```console
 >>> Pet.query.filter_by(species = 'Cat').all()
@@ -278,7 +301,7 @@ cats:
 We can filter by the primary key `id` to get a specific row:
 
 ```console
->>> Pet.query.filter_by(id=1).first()
+>>> Pet.query.filter_by(id = 1).first()
 <Pet 1, Fido, Dog>
 ```
 
@@ -291,7 +314,18 @@ primary key value:
 >>>
 ```
 
-## The Flask Shell - Update
+## Order_By
+
+By default, results from any database query are ordered by their primary key.
+The `order_by()` method allows us to sort by any column. To sort in ascending
+order of species:
+
+```console
+>>> Pet.query.order_by('species').all()
+[<Pet 2, Whiskers, Cat>, <Pet 1, Fido, Dog>]
+```
+
+## Update
 
 When we assign a new attribute value to a Python object that has been persisted
 to the database, the associated table row **does not** automatically get
@@ -317,7 +351,7 @@ We can see the table row is updated once the transaction is committed:
 
 ![update row in pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/update_pet.png)
 
-## The Flask Shell - Delete
+## Delete
 
 The `db.session.delete()` function is used to delete the row associated with an
 object:
