@@ -1,4 +1,4 @@
-# Flask-SQLAlchemy CRUD : Code-Along
+# Flask-SQLAlchemy CRUD (Flask Shell): Code-Along
 
 ## Learning Goals
 
@@ -361,8 +361,8 @@ The SQLite Viewer also shows the empty table:
 
 ## Flask shell - exit()
 
-You can exit the shell and return to the command line prompt using the `exit()`
-function:
+You can exit the Flask shell and return to the command line prompt using the
+`exit()` function:
 
 ```console
 >>> exit()
@@ -372,10 +372,10 @@ $
 
 ## Conclusion
 
-As with any shell, `Flask shell` is a great tool for debugging and adding or
-updating a few records. We want our app to handle many records though, which
-would take too long to do by hand in the Flask shell. In the following lessons,
-we'll see how to add routes to a Flask app to support full CRUD operations.
+`Flask shell` is a great tool for simple debugging and adding or updating a few
+records. We want our app to handle many records though, which would take too
+long to do by hand in the Flask shell. In subsequent lessons, we'll see how to
+add routes to a Flask app to support full CRUD operations.
 
 ---
 
