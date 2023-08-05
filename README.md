@@ -325,6 +325,29 @@ order of species:
 [<Pet 2, Whiskers, Cat>, <Pet 1, Fido, Dog>]
 ```
 
+### `func`
+
+Importing `func` from `sqlalchemy` gives us access to common SQL operations
+through functions like `sum()` and `count()`.
+
+```console
+>>>from sqlalchemy import func
+```
+
+As these operations act upon columns, we carry them out through wrapping a
+`Column` object passed to the `query()` method. Note we are invoking the `query`
+function on the session, rather than accessing the `query` attribute inherited
+from `db.Model`:
+
+```console
+>>> db.session.query(func.count(Pet.id)).first()
+(2,)
+```
+
+It is best practice to call these functions as `func.operation()` rather than
+their name alone because many of these functions have name conflicts with
+functions in the Python standard library, such as `sum()`.
+
 ## Update
 
 When we assign a new attribute value to a Python object that has been persisted
