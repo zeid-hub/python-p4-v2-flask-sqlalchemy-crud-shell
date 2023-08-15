@@ -305,15 +305,6 @@ We can filter by the primary key `id` to get a specific row:
 <Pet 1, Fido, Dog>
 ```
 
-We can also use the shorter `get()` method to get the row for a given `id`
-primary key value:
-
-```console
->>> Pet.query.get(1)
-<Pet 1, Fido, Dog>
->>>
-```
-
 ## Order_By
 
 By default, results from any database query are ordered by their primary key.
