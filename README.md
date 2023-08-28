@@ -317,8 +317,16 @@ already in the session, it will return that instance without hitting the
 database again.
 
 ```console
->>> db.session.get(Pet, 1)
+>>> pet = db.session.get(Pet,1)
+>>> pet
 <Pet 1, Fido, Dog>
+>>> pet is None
+False
+>>> pet = db.session.get(Pet,20)
+>>> pet
+>>> pet is None
+True
+>>>
 ```
 
 ## order_by()
