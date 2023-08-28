@@ -305,6 +305,13 @@ We can filter by the primary key `id` to get a specific row:
 <Pet 1, Fido, Dog>
 ```
 
+**Note**: If you want to access a certain row by its primary key, use `db.session.get(Model, id)`. It will return the row with the given primary key, or `None` if it doesn't exist. The main advantage is caching: SQLAlchemy's session maintains an identity map, so if the object with the specified ID is already in the session, it will return that instance without hitting the database again.
+
+```console
+>>> db.session.get(Pet, 1)
+<Pet 1, Fido, Dog>
+```
+
 ## Order_By
 
 By default, results from any database query are ordered by their primary key.
@@ -348,8 +355,7 @@ updated.
 We need to perform the following steps to update a row in the `pets` table:
 
 1. Update one or more attribute values of a `Pet` instance.
-2. Add the `Pet` instance to the current database session.
-3. Commit the transaction to apply the changes to the database.
+2. Commit the transaction to apply the changes to the database.
 
 ```console
 >>> pet1
@@ -357,7 +363,6 @@ We need to perform the following steps to update a row in the `pets` table:
 >>> pet1.name = "Fido the mighty"   # this does not update the table row
 >>> pet1
 <Pet 1, Fido the mighty, Dog>
->>> db.session.add(pet1)            # issue an SQL UPDATE statement
 >>> db.session.commit()             # commit the UPDATE statement
 ```
 
@@ -409,7 +414,7 @@ The SQLite Viewer also shows the empty table:
 
 ## Flask shell - exit()
 
-You can exit the Flask shell and return to the command line prompt using the
+You can exit the Flask shell and return to the command line prompt using `CTRL + D` or the
 `exit()` function:
 
 ```console
