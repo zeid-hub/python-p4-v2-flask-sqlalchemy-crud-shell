@@ -97,7 +97,7 @@ migrate, upgrade) to recreate the initial version of the database.
 
 ---
 
-## The Flask Shell - Insert
+## The Flask Shell
 
 Let's see how to persist data about a pet. Recall from the previous lessons
 about ORM that we don't actually save a Python object to the database. Instead,
@@ -124,6 +124,8 @@ First, let's import the necessary `db` database object and the `Pet` model:
 ```console
 >>> from models import db, Pet
 ```
+
+## add() and commit()
 
 Let's add a row to the `pets` table for a dog named "Fido". The steps to add a
 row are as follows:
@@ -247,7 +249,7 @@ persisted object:
 <Pet 2, Whiskers, Cat>
 ```
 
-## Query
+## query()
 
 We can query all the rows in the table associated with the `Pet` model as shown:
 
@@ -267,7 +269,7 @@ function:
 <Pet 1, Fido, Dog>
 ```
 
-## Filter
+## filter()
 
 We can filter rows using the `filter` function. The function takes a boolean
 expression as an argument that is evaluated against each model instance returned
@@ -285,7 +287,7 @@ If we want pets whose name starts with the letter 'F':
 [<Pet 1, Fido, Dog>]
 ```
 
-## Filter_by
+## filter_by()
 
 The `filter` function is powerful in that you can pass any boolean expression to
 test on a model instance. However, we often want to just look for rows having a
@@ -305,14 +307,21 @@ We can filter by the primary key `id` to get a specific row:
 <Pet 1, Fido, Dog>
 ```
 
-**Note**: If you want to access a certain row by its primary key, use `db.session.get(Model, id)`. It will return the row with the given primary key, or `None` if it doesn't exist. The main advantage is caching: SQLAlchemy's session maintains an identity map, so if the object with the specified ID is already in the session, it will return that instance without hitting the database again.
+## get()
+
+If you want to access a certain row by its primary key, use
+`db.session.get(Model, id)`. It will return the row with the given primary key,
+or `None` if it doesn't exist. The main advantage is caching: SQLAlchemy's
+session maintains an identity map, so if the object with the specified ID is
+already in the session, it will return that instance without hitting the
+database again.
 
 ```console
 >>> db.session.get(Pet, 1)
 <Pet 1, Fido, Dog>
 ```
 
-## Order_By
+## order_by()
 
 By default, results from any database query are ordered by their primary key.
 The `order_by()` method allows us to sort by any column. To sort in ascending
@@ -346,7 +355,7 @@ It is best practice to call these functions as `func.operation()` rather than
 their name alone because many of these functions have name conflicts with
 functions in the Python standard library, such as `sum()`.
 
-## Update
+## update
 
 When we assign a new attribute value to a Python object that has been persisted
 to the database, the associated table row **does not** automatically get
@@ -370,7 +379,7 @@ We can see the table row is updated once the transaction is committed:
 
 ![update row in pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/update_pet.png)
 
-## Delete
+## delete()
 
 The `db.session.delete()` function is used to delete the row associated with an
 object:
@@ -412,10 +421,10 @@ The SQLite Viewer also shows the empty table:
 
 ![new pet table](https://curriculum-content.s3.amazonaws.com/7159/python-p4-v2-flask-sqlalchemy/pet_table.png)
 
-## Flask shell - exit()
+## Exiting the Flask shell
 
-You can exit the Flask shell and return to the command line prompt using `CTRL + D` or the
-`exit()` function:
+You can exit the Flask shell and return to the command line prompt using
+`CTRL + D` or the `exit()` function:
 
 ```console
 >>> exit()
@@ -425,7 +434,7 @@ $
 
 ## Conclusion
 
-`Flask shell` is a great tool for simple debugging and adding or updating a few
+`flask shell` is a great tool for simple debugging and adding or updating a few
 records. We want our app to handle many records though, which would take too
 long to do by hand in the Flask shell. In subsequent lessons, we'll see how to
 add routes to a Flask app to support full CRUD operations.
